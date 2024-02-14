@@ -16,8 +16,11 @@ als_paths <- c("Harmonized GWAS results/single_GWAS/pmid27455348_ALS_eur.tsv.gz"
               "Harmonized GWAS results/single_GWAS/pmid29566793_ALS_eur.tsv.gz",
               "Harmonized GWAS results/single_GWAS/pmid34873335_ALS_eur.tsv.gz",
               "Harmonized GWAS results/single_GWAS/pmid34873335_ALS_eur-eas.tsv.gz")
+
 t2d_paths <-c()
 pd_paths <-c()
+
+#datax <- read.table(gzfile("Harmonized GWAS results/single_GWAS/pmid21833088_MS_eur.tsv.gz"))
 
 
 # MS
