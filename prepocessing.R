@@ -151,5 +151,36 @@ if (length(non_unique_values) == 0) {
 # Merge the betas data frames based on the "SNP" column
 merged_betas <- merge(ms_betas_unique, als_betas_unique, by = "SNP")
 
+merged_betas_first1000 <- head(merged_betas, 1000)
+
 # Merge the betas data frames based on the "SNP" column
 merged_ses <- merge(ms_ses_unique, als_ses_unique, by = "SNP")
+
+merged_ses_nonzero <- merged_ses[merged_ses$MS != 0, ]
+merged_ses_first1000 <- head(merged_ses_nonzero, 1000)
+
+# Convert into matrix
+
+# betas
+
+# Extract row names from the first column
+rownames <- merged_betas_first1000[, 1]
+
+# Remove the first column before converting to matrix
+merged_betas_first1000 <- merged_betas_first1000[, -1]
+
+# Convert dataframe to matrix and set row names
+merged_betas_first1000_matrix <- as.matrix(merged_betas_first1000)
+rownames(merged_betas_first1000_matrix) <- rownames
+
+# se
+
+# Extract row names from the first column
+rownames <- merged_ses_first1000[, 1]
+
+# Remove the first column before converting to matrix
+merged_ses_first1000 <- merged_ses_first1000[, -1]
+
+# Convert dataframe to matrix and set row names
+merged_ses_first1000_matrix <- as.matrix(merged_ses_first1000)
+rownames(merged_ses_first1000_matrix) <- rownames
