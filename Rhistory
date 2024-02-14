@@ -1,0 +1,50 @@
+install.packages("devtools")
+library(devtools)
+install_github("cnfoley/hyprcoloc", build_opts = c("--resave-data", "--no-manual"), build_vignettes = TRUE)
+library(devtools)
+library(hyprcoloc)
+install.packages("devtools")
+install_github("cnfoley/hyprcoloc", build_opts = c("--resave-data", "--no-manual"), build_vignettes = TRUE)
+library(hyprcoloc)
+library(dplyr)
+data1 <- read.table(gzfile("Harmonized GWAS results/single_GWAS/pmid21833088_MS_eur.tsv.gz"), header = TRUE, sep = "\t")
+data2 <- read.table(gzfile("Harmonized GWAS results/single_GWAS/pmid24076602_MS_eur.tsv.gz"), header = TRUE, sep = "\t")
+data3 <- read.table(gzfile("Harmonized GWAS results/single_GWAS/pmid27386562_MS_eur.tsv.gz"), header = TRUE, sep = "\t")
+ms_paths <- c("Harmonized GWAS results/single_GWAS/pmid21833088_MS_eur.tsv.gz", "Harmonized GWAS results/single_GWAS/pmid24076602_MS_eur.tsv.gz", "Harmonized GWAS results/single_GWAS/pmid27386562_MS_eur.tsv.gz")
+# Read each .gz file and bind the resulting data frames together
+ms_betas <- lapply(ms_paths, function(ms_paths) {
+# Read the data and explicitly specify the column types to ensure consistency
+data <- read.table(gzfile(ms_paths), header = TRUE, sep = "\t",na.strings = "-NA", stringsAsFactors = FALSE, colClasses = c(beta_effect = "numeric"))
+new_column_name <- as.character(data$trait[1])
+data %>%
+select(SNP, beta_effect) %>%
+rename(!!new_column_name := beta_effect)
+}) %>% bind_rows()
+View(ms_betas)
+View(ms_betas)
+# Check if all values in the 'SNP' column are unique
+is_unique <- uniqueN(dt$SNP) == nrow(ms_betas)
+library(data.table)
+# Check if all values in the 'SNP' column are unique
+is_unique <- uniqueN(dt$SNP) == nrow(ms_betas)
+# Check if all values in the 'SNP' column are unique
+is_unique <- uniqueN(ms_betas$SNP) == nrow(ms_betas)
+if (is_unique) {
+print("All values in the 'SNP' column are unique.")
+} else {
+print("There are duplicate values in the 'SNP' column.")
+}
+# Get counts of each SNP value
+snp_counts <- ms_betas[, .N, by = SNP]
+# Get counts of each SNP value
+snp_counts <- table(dt$SNP)
+# Get counts of each SNP value
+snp_counts <- table(ms_betas$SNP)
+# Filter for non-unique values
+non_unique_values <- names(snp_counts)[snp_counts > 1]
+if (length(non_unique_values) == 0) {
+print("All values in the 'SNP' column are unique.")
+} else {
+print("Non-unique values in the 'SNP' column along with their counts:")
+print(data.frame(SNP = non_unique_values, Count = snp_counts[non_unique_values]))
+}
