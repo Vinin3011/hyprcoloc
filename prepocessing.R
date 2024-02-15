@@ -2,9 +2,13 @@ library(hyprcoloc)
 library(dplyr)
 library(data.table)
 
+# create array of paths
+path_array <- array(list())
+
 ms_paths <- c("Harmonized GWAS results/single_GWAS/pmid21833088_MS_eur.tsv.gz", 
               "Harmonized GWAS results/single_GWAS/pmid24076602_MS_eur.tsv.gz", 
               "Harmonized GWAS results/single_GWAS/pmid27386562_MS_eur.tsv.gz")
+path_array[[1]] <- ms_paths
 
 als_paths <- c("Harmonized GWAS results/single_GWAS/pmid27455348_ALS_eur.tsv.gz", 
               "Harmonized GWAS results/single_GWAS/pmid28931804_ALS_eur-eas.tsv.gz",
@@ -12,9 +16,38 @@ als_paths <- c("Harmonized GWAS results/single_GWAS/pmid27455348_ALS_eur.tsv.gz"
               "Harmonized GWAS results/single_GWAS/pmid29566793_ALS_eur.tsv.gz",
               "Harmonized GWAS results/single_GWAS/pmid34873335_ALS_eur.tsv.gz",
               "Harmonized GWAS results/single_GWAS/pmid34873335_ALS_eur-eas.tsv.gz")
+path_array[[2]] <- als_paths
 
-t2d_paths <-c()
-pd_paths <-c()
+t2d_paths <-c("Harmonized GWAS results/single_GWAS/pmid30054458_T2D_eur-sas.tsv.gz")
+path_array[[3]] <- t2d_paths
+
+pd_paths <-c("Harmonized GWAS results/single_GWAS/pmid33111402_PD_eur.tsv.gz",
+             "Harmonized GWAS results/single_GWAS/pmid33987465_PD_eur.tsv.gz",
+             "Harmonized GWAS results/single_GWAS/pmid34594039_PD_meta-eas-eur.tsv.gz",
+             "Harmonized GWAS results/single_GWAS/pmid34594039_PD_nonmeta-eas.tsv.gz")
+path_array[[4]] <- pd_paths
+
+ra_paths <-c("Harmonized GWAS results/single_GWAS/pmid33310728_RA_eas-eur.tsv.gz")
+path_array[[5]] <- ra_paths
+
+dlb_paths <-c("Harmonized GWAS results/pmid33589841_DLB_eur.tsv.gz")
+path_array[[6]] <- dlb_paths
+
+scz_paths <-c("Harmonized GWAS results/single_GWAS/pmid34594039_SCZ_meta-eas-eur.tsv.gz",
+             "Harmonized GWAS results/single_GWAS/pmid34594039_SCZ_nonmeta-eas.tsv.gz")
+path_array[[7]] <- scz_paths
+
+c3_paths <-c("Harmonized GWAS results/single_GWAS/pmid34648354_C3_eur.tsv.gz")
+path_array[[8]] <- c3_paths
+
+crp_paths <-c("Harmonized GWAS results/single_GWAS/pmid34648354_CRP_eur.tsv.gz")
+path_array[[9]] <- crp_paths
+
+aph_paths <-c("Harmonized GWAS results/single_GWAS/pmid34737426_APH_eur.tsv.gz")
+path_array[[10]] <- aph_paths
+
+path_array
+
 
 # MS
 # betas table creation
