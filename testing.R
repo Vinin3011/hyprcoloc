@@ -1,5 +1,10 @@
-ms_betas_unique2 <- create_betas_df(ms_paths)
 
+# test functions
+
+ms_betas_unique2 <- create_betas_df(ms_paths) # betas_df function
+
+# -----------------------------------------------
+# Check if two dataframes are identical
 identical <- identical(ms_betas_unique, ms_betas_unique2)
 
 if (identical) {
@@ -8,5 +13,24 @@ if (identical) {
   print("The data frames are not identical.")
 }
 
+# -----------------------------------------------
+# Check if values in SNP are unique and print the non-unique values if present
+
+# Get counts of each SNP value ()
+snp_counts <- table(dataframe_of_interest$SNP)
+
+# Filter for non-unique values
+non_unique_values <- names(snp_counts)[snp_counts > 1]
+
+if (length(non_unique_values) == 0) {
+  print("All values in the 'SNP' column are unique.")
+} else {
+  print("Non-unique values in the 'SNP' column along with their counts:")
+  print(data.frame(SNP = non_unique_values, Count = snp_counts[non_unique_values]))
+}
+
+# -------------------------------------------------
 # cleanup
 rm(identical, ms_betas_unique2)
+
+

@@ -1,6 +1,7 @@
 library(hyprcoloc)
 library(dplyr)
 library(data.table)
+library(purrr)
 
 # create array of paths
 path_array <- array(list())
@@ -46,174 +47,86 @@ path_array[[9]] <- crp_paths
 aph_paths <-c("Harmonized GWAS results/single_GWAS/pmid34737426_APH_eur.tsv.gz")
 path_array[[10]] <- aph_paths
 
+# print path array
 path_array
 
+# Create lists to fill with betas and ses df
+betas_df_list <- list()
+ses_df_list <- list()
 
-# MS
-# betas table creation
 
-# Read each .gz file and bind the resulting data frames together
-ms_betas <- lapply(ms_paths, function(ms_paths) {
-  # Read the data and explicitly specify the column types to ensure consistency
-  data <- read.table(gzfile(ms_paths), header = TRUE, sep = "\t",na.strings = "-NA", stringsAsFactors = FALSE, colClasses = c(beta_effect = "numeric"))
-  new_column_name <- as.character(data$trait[1])
-  data %>%
-    select(SNP, beta_effect) %>%
-    rename(!!new_column_name := beta_effect)
-}) %>% bind_rows() # combine into single data frame
-
-# remove NA values
-ms_betas <- ms_betas[ms_betas$SNP != "NA", ]
-
-# remove duplicates
-ms_betas_unique <- ms_betas[!duplicated(ms_betas$SNP), ]
-
-# Check if values in SNP are unique and print the non-unique values if present
-
-# Get counts of each SNP value
-snp_counts <- table(ms_betas_unique$SNP)
-
-# Filter for non-unique values
-non_unique_values <- names(snp_counts)[snp_counts > 1]
-
-if (length(non_unique_values) == 0) {
-  print("All values in the 'SNP' column are unique.")
-} else {
-  print("Non-unique values in the 'SNP' column along with their counts:")
-  print(data.frame(SNP = non_unique_values, Count = snp_counts[non_unique_values]))
+# Fill list
+for (i in seq_along(path_array)) {
+  sublist <- path_array[[i]]  # Get the sublist
+  
+  # Get trait name
+  trait <- extract_trait(sublist[1])
+  print(paste("Creating betas and ses dataframe for: ", trait))
+  
+  # attempt to create betas df from sublist and continue if an error occurs
+  result_betas_df <- tryCatch(create_betas_df(sublist), error = function(e){
+    print(paste("create_betas_df produced the following error for trait ", trait, ":",e))
+    print("continue with next trait...")
+    return(NULL)  # Return NULL to assign an empty dataframe
+  })
+  
+  # Skip the rest of the loop if an error occurred
+  if(is.null(result_betas_df)){
+    next  
+  }
+  
+  # attempt to create betas df from sublist and continue if an error occurs
+  result_ses_df <- tryCatch(create_ses_df(sublist), error = function(e){
+    print(paste("create_betas_df produced the following error for trait ", trait, ":",e))
+    print("continue with next trait...")
+    return(NULL)  # Return NULL to assign an empty dataframe
+  })
+  
+  # Skip the rest of the loop if an error occurred
+  if(is.null(result_ses_df)){
+    next  
+  }
+  
+  # Store the result dataframe along with the trait name in the results list
+  betas_df_list[[trait]] <- result_betas_df
+  ses_df_list[[trait]] <- result_ses_df
 }
 
-# se table creation
-# Read each .gz file and bind the resulting data frames together
-ms_ses <- lapply(ms_paths, function(ms_paths) {
-  # Read the data and explicitly specify the column types to ensure consistency
-  data <- read.table(gzfile(ms_paths), header = TRUE, sep = "\t",na.strings = "-NA", stringsAsFactors = FALSE, colClasses = c(SE = "numeric"))
-  new_column_name <- as.character(data$trait[1])
-  data %>%
-    select(SNP, SE) %>%
-    rename(!!new_column_name := SE)
-}) %>% bind_rows() # combine into single data frame
-
-# remove NA values
-ms_ses <- ms_ses[ms_ses$SNP != "NA", ]
-
-# remove duplicates
-ms_ses_unique <- ms_ses[!duplicated(ms_ses$SNP), ]
-
-# Check if values in SNP are unique and print the non-unique values if present
-
-# Get counts of each SNP value
-snp_counts <- table(ms_ses_unique$SNP)
-
-# Filter for non-unique values
-non_unique_values <- names(snp_counts)[snp_counts > 1]
-
-if (length(non_unique_values) == 0) {
-  print("All values in the 'SNP' column are unique.")
-} else {
-  print("Non-unique values in the 'SNP' column along with their counts:")
-  print(data.frame(SNP = non_unique_values, Count = snp_counts[non_unique_values]))
-}
-
-# ALS
-# betas table creation
-# Read each .gz file and bind the resulting data frames together
-als_betas <- lapply(als_paths, function(als_paths) {
-  # Read the data and explicitly specify the column types to ensure consistency
-  data <- read.table(gzfile(als_paths), header = TRUE, sep = "\t",na.strings = "-NA", stringsAsFactors = FALSE, colClasses = c(beta_effect = "numeric"))
-  new_column_name <- as.character(data$trait[1])
-  data %>%
-    select(SNP, beta_effect) %>%
-    rename(!!new_column_name := beta_effect)
-}) %>% bind_rows() # combine into single data frame
-
-# remove NA values
-als_betas <- als_betas[als_betas$SNP != "NA", ]
-
-# remove duplicates
-als_betas_unique <- als_betas[!duplicated(als_betas$SNP), ]
-
-# Check if values in SNP are unique and print the non-unique values if present
-
-# Get counts of each SNP value
-snp_counts <- table(als_betas_unique$SNP)
-
-# Filter for non-unique values
-non_unique_values <- names(snp_counts)[snp_counts > 1]
-
-if (length(non_unique_values) == 0) {
-  print("All values in the 'SNP' column are unique.")
-} else {
-  print("Non-unique values in the 'SNP' column along with their counts:")
-  print(data.frame(SNP = non_unique_values, Count = snp_counts[non_unique_values]))
-}
-
-# se table creation
-# Read each .gz file and bind the resulting data frames together
-als_ses <- lapply(als_paths, function(als_paths) {
-  # Read the data and explicitly specify the column types to ensure consistency
-  data <- read.table(gzfile(als_paths), header = TRUE, sep = "\t",na.strings = "-NA", stringsAsFactors = FALSE, colClasses = c(SE = "numeric"))
-  new_column_name <- as.character(data$trait[1])
-  data %>%
-    select(SNP, SE) %>%
-    rename(!!new_column_name := SE)
-}) %>% bind_rows() # combine into single data frame
-
-# remove NA values
-als_ses <- als_ses[als_ses$SNP != "NA", ]
-
-# remove duplicates
-als_ses_unique <- als_ses[!duplicated(als_ses$SNP), ]
-
-# Check if values in SNP are unique and print the non-unique values if present
-
-# Get counts of each SNP value
-snp_counts <- table(als_ses_unique$SNP)
-
-# Filter for non-unique values
-non_unique_values <- names(snp_counts)[snp_counts > 1]
-
-if (length(non_unique_values) == 0) {
-  print("All values in the 'SNP' column are unique.")
-} else {
-  print("Non-unique values in the 'SNP' column along with their counts:")
-  print(data.frame(SNP = non_unique_values, Count = snp_counts[non_unique_values]))
-}
-
+# create subsets
+betas_test_list <- betas_df_list[1:4]
+ses_test_list <- ses_df_list[1:4]
 
 # Merge the betas data frames based on the "SNP" column
-merged_betas <- merge(ms_betas_unique, als_betas_unique, by = "SNP")
+merged_betas <- reduce(betas_test_list, inner_join, by = "SNP")
 
-merged_betas_first1000 <- head(merged_betas, 1000)
+# Merge the ses data frames based on the "SNP" column
+merged_ses <- reduce(ses_test_list, inner_join, by = "SNP")
 
-# Merge the betas data frames based on the "SNP" column
-merged_ses <- merge(ms_ses_unique, als_ses_unique, by = "SNP")
+# remove zero values to avoid error in hyprcoloc
+merged_ses <- merged_ses[merged_ses$MS != 0, ]
 
-merged_ses_nonzero <- merged_ses[merged_ses$MS != 0, ]
-merged_ses_first1000 <- head(merged_ses_nonzero, 1000)
+# merged_ses_first1000 <- head(merged_ses_nonzero, 1000)
 
-# Convert into matrix
+# Convert into matrices ------------------------------------
 
-# betas
-
-# Extract row names from the first column
-rownames <- merged_betas_first1000[, 1]
-
-# Remove the first column before converting to matrix
-merged_betas_first1000 <- merged_betas_first1000[, -1]
-
-# Convert dataframe to matrix and set row names
-merged_betas_first1000_matrix <- as.matrix(merged_betas_first1000)
-rownames(merged_betas_first1000_matrix) <- rownames
-
-# se
+# betas 
 
 # Extract row names from the first column
-rownames <- merged_ses_first1000[, 1]
-
+rownames <- merged_betas[, 1]
 # Remove the first column before converting to matrix
-merged_ses_first1000 <- merged_ses_first1000[, -1]
-
+merged_betas <- merged_betas[, -1]
 # Convert dataframe to matrix and set row names
-merged_ses_first1000_matrix <- as.matrix(merged_ses_first1000)
-rownames(merged_ses_first1000_matrix) <- rownames
+merged_betas_matrix <- as.matrix(merged_betas)
+rownames(merged_betas_matrix) <- rownames
+
+
+# ses 
+
+# Extract row names from the first column
+rownames <- merged_ses[, 1]
+# Remove the first column before converting to matrix
+merged_ses <- merged_ses[, -1]
+# Convert dataframe to matrix and set row names
+merged_ses_matrix <- as.matrix(merged_ses)
+rownames(merged_ses_matrix) <- rownames
+
