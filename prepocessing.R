@@ -79,21 +79,21 @@ merged_betas_nonzero <- merged_betas[merged_ses$MS != 0,]
 # betas 
 
 # Extract row names from the first column
-rownames <- merged_betas[, 1]
+rownames <- merged_betas_nonzero[, 1]
 # Remove the first column before converting to matrix
-merged_betas <- merged_betas[, -1]
+merged_betas_nonzero <- merged_betas_nonzero[, -1]
 # Convert dataframe to matrix and set row names
-merged_betas_matrix <- as.matrix(merged_betas)
+merged_betas_matrix <- as.matrix(merged_betas_nonzero)
 rownames(merged_betas_matrix) <- rownames
 
 
 # ses 
 
 # Extract row names from the first column
-rownames <- merged_ses[, 1]
+rownames <- merged_ses_nonzero[, 1]
 # Remove the first column before converting to matrix
-merged_ses <- merged_ses[, -1]
+merged_ses_nonzero <- merged_ses_nonzero[, -1]
 # Convert dataframe to matrix and set row names
-merged_ses_matrix <- as.matrix(merged_ses)
+merged_ses_matrix <- as.matrix(merged_ses_nonzero)
 rownames(merged_ses_matrix) <- rownames
 
