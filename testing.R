@@ -29,8 +29,21 @@ if (length(non_unique_values) == 0) {
   print(data.frame(SNP = non_unique_values, Count = snp_counts[non_unique_values]))
 }
 
+# ----------------------------------------------- 
+cytokines_directory <- "Harmonized GWAS results/cytokines"
+
+# Retrieve paths of all .tsv.gz files in the directory
+cytokines_paths <- list.files(cytokines_directory, full.names = TRUE)
+
+# Print the file paths
+print(cytokines_paths)
+
+test_cytokine <- read.table(gzfile(cytokines_paths[1]), header = TRUE, sep = "\t")
+
+
 # -------------------------------------------------
 # cleanup
 rm(identical, ms_betas_unique2)
+rm(file_paths)
 
 
