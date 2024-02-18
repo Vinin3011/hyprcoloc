@@ -3,7 +3,8 @@ library(dplyr)
 library(data.table)
 library(purrr)
 
-traits_of_interest <- list("MS", "ALS")
+traits_of_interest <- list("IL6", "IFNg", "MCP1", "eotaxin")
+
 
 # paths for cytokines and single GWAS
 cytokines_directory <- "Harmonized GWAS results/cytokines"
@@ -69,10 +70,13 @@ merged_betas <- reduce(betas_df_list, inner_join, by = "SNP")
 # Merge the ses data frames based on the "SNP" column
 merged_ses <- reduce(ses_df_list, inner_join, by = "SNP")
 
-# remove zero values to avoid error in hyprcoloc
-zero_rows <- merged_ses[merged_ses$MS == 0, ]
-merged_ses_nonzero <- merged_ses[merged_ses$MS != 0, ]
-merged_betas_nonzero <- merged_betas[merged_ses$MS != 0,]
+# Get the column names except the first one (assuming it's "SNP")
+cols <- names(merged_ses)[-1]
+
+# Remove rows with zero values in any column except the first one
+merged_ses_nonzero <- merged_ses[rowSums(merged_ses[cols] == 0) == 0, ]
+merged_betas_nonzero <- merged_betas[rowSums(merged_betas[cols] == 0) == 0, ]
+
 
 # Convert into matrices ------------------------------------
 
