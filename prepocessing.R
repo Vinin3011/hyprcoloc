@@ -26,7 +26,7 @@ betas_df_list <- list()
 ses_df_list <- list()
 
 
-# Create ses and betas df
+# Create ses and betas df for every trait of interest
 for (i in seq_along(paths_of_interest)) {
   sublist <- paths_of_interest[[i]]  # Get the sublist
   
