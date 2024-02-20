@@ -23,6 +23,8 @@ others <- c("CRP", "C3", "APH", "IL2", "IL2ra", "IL5", "IL7", "IL8", "IL16", "IL
 
 traits_of_interest <- list("CTACK", "IL18", "MIP1b", "IL8", "T2D")
 
+# cluster traits by region?
+region_traits <- TRUE
 
 # paths for cytokines and single GWAS
 cytokines_directory <- "Harmonized GWAS results/cytokines"
@@ -33,9 +35,9 @@ single_GWAS_paths <- list.files(single_GWAS_directory, full.names = TRUE)
 metabolite_paths <- list.files(metabolite_directory, full.names = TRUE)
 
 # group the paths by traits in lists
-single_GWAS_traits_list <- group_paths_by_trait(single_GWAS_paths)
-cytokine_traits_list <- group_paths_by_trait(cytokines_paths)
-metabolite_traits_list <- group_paths_by_trait(metabolite_paths)
+single_GWAS_traits_list <- group_paths_by_trait(single_GWAS_paths, fullnames = region_traits)
+cytokine_traits_list <- group_paths_by_trait(cytokines_paths, fullnames = region_traits)
+metabolite_traits_list <- group_paths_by_trait(metabolite_paths, fullnames = region_traits)
 
 all_traits_list <- c(single_GWAS_traits_list, cytokine_traits_list, metabolite_traits_list)
 

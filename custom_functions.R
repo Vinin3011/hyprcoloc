@@ -1,11 +1,11 @@
 # Function to group paths together
-group_paths_by_trait <- function(path_list){
+group_paths_by_trait <- function(path_list, fullnames = FALSE){
   output_list <- list()
   
   for (i in seq_along(path_list)){
     trait_path <- path_list[i]
     # get trait name
-    trait <- extract_trait(trait_path)
+    trait <- extract_trait(trait_path, fullname = fullnames)
     # see if already present in list and create new entry or extend existing entry
     if(trait %in% names(output_list)){
       existing_traits <- output_list[[trait]]
@@ -80,8 +80,15 @@ create_ses_df <- function(paths){
 # -------------------------------------------------------------------
 
 # Function to extract the trait from a standard GWAS file path name
-extract_trait <- function(file_path) {
+extract_trait <- function(file_path, fullname = FALSE) {
+  # Specify if we want to be more specific for the trait name
+  pat <- ".*pmid[0-9]+_([A-Za-z0-9]+).*"
+  if(fullname){
+    pat <- ".*pmid[0-9]+_([^\\.]+)\\..*" # capture everything aside from a dot
+  }
+  
   # Extract the trait abbreviation using regular expression
-  trait <- gsub(".*pmid[0-9]+_([A-Za-z0-9]+).*", "\\1", file_path)
+  trait <- gsub(pat, "\\1", file_path)
   return(trait)
 }
+
