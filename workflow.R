@@ -166,7 +166,28 @@ res <- hyprcoloc(merged_betas_matrix, merged_ses_matrix, trait.names=traits, snp
 # 3         3   None             NA        0.9658            NA                         NA           IL6
 
 # 3.1.0.4 Analysis protocol: a one stop sensitivity assessment
+sensitivity.plot(merged_betas_matrix, merged_ses_matrix, trait.names = traits, snp.id=rsid, 
+                 reg.thresh = c(0.6,0.7,0.8,0.9), align.thresh = c(0.6,0.7,0.8,0.9), prior.c = c(0.02, 0.01, 0.005), equal.thresholds = FALSE)
 
+sensitivity.plot(merged_betas_matrix, merged_ses_matrix, trait.names = traits, snp.id=rsid, 
+                 reg.thresh = c(0.6,0.7,0.8,0.9), align.thresh = c(0.6,0.7,0.8,0.9), prior.c = c(0.02, 0.01, 0.005), equal.thresholds = FALSE, similarity.matrix = TRUE)
+res
+
+# 3.2.1 Assessing differences between the Bayesian divisive clustering criteria
+res <- hyprcoloc(merged_betas_matrix, merged_ses_matrix, trait.names=traits, snp.id=rsid, bb.selection = "regional")
+print(res)
+
+res <- hyprcoloc(merged_betas_matrix, merged_ses_matrix, trait.names=traits, snp.id=rsid, bb.selection = "align")
+print(res)
+
+res <- hyprcoloc(merged_betas_matrix, merged_ses_matrix, trait.names=traits, snp.id=rsid, bb.selection = FALSE)
+print(res)
+
+
+traits <- colnames(merged_betas_matrix)
+rsid <- rownames(merged_betas_matrix)
+res <- hyprcoloc(merged_betas_matrix, merged_ses_matrix, trait.names=traits, snp.id=rsid, snpscores = TRUE)
+res[[1]]
 sensitivity.plot(merged_betas_matrix, merged_ses_matrix, trait.names = traits, snp.id=rsid, 
                  reg.thresh = c(0.6,0.7,0.8,0.9), align.thresh = c(0.6,0.7,0.8,0.9), prior.c = c(0.02, 0.01, 0.005), equal.thresholds = FALSE)
 
