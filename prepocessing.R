@@ -9,15 +9,17 @@ traits_of_interest <- list("IL6", "IFNg", "MCP1", "eotaxin")
 # paths for cytokines and single GWAS
 cytokines_directory <- "Harmonized GWAS results/cytokines"
 single_GWAS_directory <- "Harmonized GWAS results/single_GWAS"
+metabolite_directory <- "Harmonized GWAS results/metabolites"
 cytokines_paths <- list.files(cytokines_directory, full.names = TRUE)
 single_GWAS_paths <- list.files(single_GWAS_directory, full.names = TRUE)
+metabolite_paths <- list.files(metabolite_directory, full.names = TRUE)
 
 # group the paths by traits in lists
 single_GWAS_traits_list <- group_paths_by_trait(single_GWAS_paths)
-
 cytokine_traits_list <- group_paths_by_trait(cytokines_paths)
+metabolite_traits_list <- group_paths_by_trait(metabolite_paths)
 
-all_traits_list <- c(single_GWAS_traits_list, cytokine_traits_list)
+all_traits_list <- c(single_GWAS_traits_list, cytokine_traits_list, metabolite_traits_list)
 
 # get paths of interest
 paths_of_interest <- get_paths_of_interest(all_traits_list, traits_of_interest)

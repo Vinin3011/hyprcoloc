@@ -42,8 +42,36 @@ test_cytokine <- read.table(gzfile(cytokines_paths[1]), header = TRUE, sep = "\t
 
 
 # -------------------------------------------------
+# read metabolite tsv files
+test_betas_list <- list()
+
+for (i in seq_along(metabolite_traits_list)){
+  sublist <- metabolite_traits_list[[i]]
+  
+  # Get trait name
+  trait <- extract_trait(sublist[1])
+  print(paste("Creating betas and ses dataframe for: ", trait))
+  
+  result_betas_df <- tryCatch(create_betas_df(sublist), error = function(e){
+    print(paste("create_betas_df produced the following error for trait ", trait, ":",e))
+    print("continue with next trait...")
+    return(NULL)  # Return NULL to assign an empty dataframe
+  })
+  
+  # Skip the rest of the loop if an error occurred
+  if(is.null(result_betas_df)){
+    next  
+  }
+  
+  test_betas_list[[trait]] <- result_betas_df
+}
+
+
+# -------------------------------------------------
+
 # cleanup
 rm(identical, ms_betas_unique2)
 rm(file_paths)
+rm(test_betas_list)
 
 
