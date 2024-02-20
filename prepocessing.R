@@ -3,7 +3,6 @@ library(dplyr)
 library(data.table)
 library(purrr)
 
-<<<<<<< HEAD
 # Metabolites
 
 metabolites <- c("Ser", "IL1", "PRTN3")
@@ -23,9 +22,6 @@ others <- c("CRP", "C3", "APH", "IL2", "IL2ra", "IL5", "IL7", "IL8", "IL16", "IL
 
 
 traits_of_interest <- list("CTACK", "IL18", "MIP1b", "IL8", "T2D")
-=======
-traits_of_interest <- list("IL6", "IFNg", "MCP1", "eotaxin")
->>>>>>> dc2d74062033996957d29c599c3c6dbcc998765d
 
 
 # paths for cytokines and single GWAS
