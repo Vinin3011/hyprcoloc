@@ -3,6 +3,7 @@ library(dplyr)
 library(data.table)
 library(purrr)
 
+<<<<<<< HEAD
 # Metabolites
 
 metabolites <- c("Ser", "IL1", "PRTN3")
@@ -22,22 +23,25 @@ others <- c("CRP", "C3", "APH", "IL2", "IL2ra", "IL5", "IL7", "IL8", "IL16", "IL
 
 
 traits_of_interest <- list("CTACK", "IL18", "MIP1b", "IL8", "T2D")
+=======
+traits_of_interest <- list("IL6", "IFNg", "MCP1", "eotaxin")
+>>>>>>> dc2d74062033996957d29c599c3c6dbcc998765d
 
 
 # paths for cytokines and single GWAS
 cytokines_directory <- "Harmonized GWAS results/cytokines"
 single_GWAS_directory <- "Harmonized GWAS results/single_GWAS"
-metabolites_directory <- "Harmonized GWAS results/metabolites"
+metabolite_directory <- "Harmonized GWAS results/metabolites"
 cytokines_paths <- list.files(cytokines_directory, full.names = TRUE)
 single_GWAS_paths <- list.files(single_GWAS_directory, full.names = TRUE)
-metabolites_paths <- list.files(metabolites_directory, full.names = TRUE)
+metabolite_paths <- list.files(metabolite_directory, full.names = TRUE)
 
 # group the paths by traits in lists
 single_GWAS_traits_list <- group_paths_by_trait(single_GWAS_paths)
 cytokine_traits_list <- group_paths_by_trait(cytokines_paths)
-metabolites_traits_list <- group_paths_by_trait(metabolites_paths)
+metabolite_traits_list <- group_paths_by_trait(metabolite_paths)
 
-all_traits_list <- c(single_GWAS_traits_list, cytokine_traits_list, metabolites_paths)
+all_traits_list <- c(single_GWAS_traits_list, cytokine_traits_list, metabolite_traits_list)
 
 # get paths of interest
 paths_of_interest <- get_paths_of_interest(all_traits_list, traits_of_interest)
@@ -46,8 +50,8 @@ paths_of_interest <- get_paths_of_interest(all_traits_list, traits_of_interest)
 betas_df_list <- list()
 ses_df_list <- list()
 
-print(names(all_traits_list))
-# Create ses and betas df
+
+# Create ses and betas df for every trait of interest
 for (i in seq_along(paths_of_interest)) {
   sublist <- paths_of_interest[[i]]  # Get the sublist
   
