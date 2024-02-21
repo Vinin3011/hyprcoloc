@@ -49,7 +49,39 @@ for (i in seq_along(trait_groups_of_interest)) {
   merged_df_list[[traits_group]] <- current_merged_dfs
 }
 
+# List of all hyprcoloc results
+res_list <- list()
 
+for (i in seq_along(merged_df_list)) {
+  # Get list of data frames
+  current_dfs <- merged_df_list[[i]]
+  
+  # extract data frames
+  merged_betas_matrix <- current_dfs[["betas"]]
+  merged_ses_matrix <- current_dfs[["ses"]]
+ 
+  # Arrange arguments for analysis function
+  traits <- colnames(merged_betas_matrix)
+  rsid <- rownames(merged_betas_matrix)
+ 
+  # run hyprcoloc analysis with extracted data frames
+  res <- hyprcoloc(merged_betas_matrix, merged_ses_matrix, trait.names=traits, snp.id=rsid, snpscores = TRUE)
+
+  sensitvity_plot <- sensitivity.plot(merged_betas_matrix, merged_ses_matrix, trait.names = traits, snp.id=rsid, 
+                   reg.thresh = c(0.6,0.7,0.8,0.9), align.thresh = c(0.6,0.7,0.8,0.9), prior.c = c(0.02, 0.01, 0.005), equal.thresholds = FALSE, similarity.matrix = TRUE)
+  
+  output_list <- list(
+    traits = traits,
+    res = res,
+    sens_plot = sensitvity_plot
+  )
+
+  # group
+  traits_group <- paste(traits, collapse = ", ")
+  
+  # Add to result list 
+  res_list[[traits_group]] <- output_list
+}
 
 
 
