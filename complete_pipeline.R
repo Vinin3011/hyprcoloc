@@ -83,7 +83,34 @@ for (i in seq_along(merged_df_list)) {
   res_list[[traits_group]] <- output_list
 }
 
+trait_names <- names(all_traits_list)
 
+trait_dataframe <- data.frame(traits = trait_names)
+rownames(trait_dataframe) <- trait_names
+
+similarity_matrices <- list()
+for (entry in res_list) {
+  matrix <- entry$sens_plot[[2]]
+  print(matrix)
+  similarity_matrices <- c(similarity_matrices, list(matrix))
+}
+
+similarity_data_frames <- list()
+
+for (matrix in similarity_matrices) {
+  # Convert the matrix into a data frame
+  matrix_df <- as.data.frame(matrix)
+  
+  similarity_data_frames <- c(similarity_data_frames, list(matrix_df))
+}
+
+heatmap_data <- as.matrix(trait_dataframe[, -ncol(trait_dataframe)])
+rownames(heatmap_data) <- trait_dataframe$Traits
+
+heatmap_data <- apply(heatmap_data, 2, as.numeric)
+
+heatmap(heatmap_data, Rowv = NA, Colv = NA, scale = "row",
+        xlab = "Traits", ylab = "Samples", main = "Heatmap of Traits")
 
 
 
