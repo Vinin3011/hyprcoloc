@@ -1,3 +1,103 @@
+# Function to create from a list of paths corresponding to GWAS studies of traits of interest
+# a merged betas and merged ses data frame
+
+create_merged_betas_for_traits <- function(paths_of_interest, fullname = FALSE){
+  # Create lists to fill with betas and ses df
+  betas_df_list <- list()
+  ses_df_list <- list()
+  traitnames_list <- list()
+  
+  
+  # Create ses and betas df for every trait of interest
+  for (i in seq_along(paths_of_interest)) {
+    sublist <- paths_of_interest[[i]]  # Get the sublist
+    
+    # Get trait name
+    trait <- extract_trait(sublist[1], fullname)
+    print(paste("Creating betas and ses dataframe for: ", trait))
+    # Store trait in list
+    traitnames_list[length(traitnames_list)+1] <- trait
+    
+    # attempt to create betas df from sublist and continue if an error occurs
+    result_betas_df <- tryCatch(create_betas_df(sublist), error = function(e){
+      print(paste("create_betas_df produced the following error for trait ", trait, ":",e))
+      print("continue with next trait...")
+      return(NULL)  # Return NULL to assign an empty dataframe
+    })
+    
+    # Skip the rest of the loop if an error occurred
+    if(is.null(result_betas_df)){
+      next  
+    }
+    
+    # attempt to create betas df from sublist and continue if an error occurs
+    result_ses_df <- tryCatch(create_ses_df(sublist), error = function(e){
+      print(paste("create_betas_df produced the following error for trait ", trait, ":",e))
+      print("continue with next trait...")
+      return(NULL)  # Return NULL to assign an empty dataframe
+    })
+    
+    # Skip the rest of the loop if an error occurred
+    if(is.null(result_ses_df)){
+      next  
+    }
+    
+    # Store the result dataframe along with the trait name in the results list
+    betas_df_list[[trait]] <- result_betas_df
+    ses_df_list[[trait]] <- result_ses_df
+  }
+  
+  # Merge the betas data frames based on the "SNP" column
+  merged_betas <- reduce(betas_df_list, inner_join, by = "SNP")
+  
+  # Merge the ses data frames based on the "SNP" column
+  merged_ses <- reduce(ses_df_list, inner_join, by = "SNP")
+  
+  # Get the column names except the first one (assuming it's "SNP")
+  cols <- names(merged_ses)[-1]
+  
+  # Remove rows with zero values in any column except the first one
+  merged_ses_nonzero <- merged_ses[rowSums(merged_ses[cols] == 0) == 0, ]
+  merged_betas_nonzero <- merged_betas[rowSums(merged_betas[cols] == 0) == 0, ]
+  
+  
+  # Convert into matrices ------------------------------------
+  
+  # betas 
+  
+  # Extract row names from the first column
+  rownames <- merged_betas_nonzero[, 1]
+  # Remove the first column before converting to matrix
+  merged_betas_nonzero <- merged_betas_nonzero[, -1]
+  # Convert dataframe to matrix and set row names
+  merged_betas_matrix <- as.matrix(merged_betas_nonzero)
+  rownames(merged_betas_matrix) <- rownames
+  
+  
+  # ses 
+  
+  # Extract row names from the first column
+  rownames <- merged_ses_nonzero[, 1]
+  # Remove the first column before converting to matrix
+  merged_ses_nonzero <- merged_ses_nonzero[, -1]
+  # Convert dataframe to matrix and set row names
+  merged_ses_matrix <- as.matrix(merged_ses_nonzero)
+  rownames(merged_ses_matrix) <- rownames
+  
+  # output a list with traitnames and both merged matrices (betas and ses)
+  output <- list(
+    traits = traitnames_list,
+    ses = merged_ses_matrix,
+    betas = merged_betas_matrix
+  )
+  
+  return(output)
+}
+
+# -------------------------------------------------------------------
+
+
+
 # Function to group paths together
 group_paths_by_trait <- function(path_list, fullnames = FALSE){
   output_list <- list()

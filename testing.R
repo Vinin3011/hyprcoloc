@@ -42,6 +42,11 @@ test_cytokine <- read.table(gzfile(cytokines_paths[1]), header = TRUE, sep = "\t
 
 
 # -------------------------------------------------
+# test create_merged_betas_for_traits
+test_list <- create_merged_betas_for_traits(paths_of_interest)
+
+# -------------------------------------------------
+
 # cleanup
 rm(identical, ms_betas_unique2)
 rm(file_paths)
