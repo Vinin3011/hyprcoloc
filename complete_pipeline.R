@@ -83,10 +83,12 @@ for (i in seq_along(merged_df_list)) {
   res_list[[traits_group]] <- output_list
 }
 
+# Extrahiere die Namen der äußeren Liste (die Trait-Namen)
 trait_names <- names(all_traits_list)
 
 trait_dataframe <- data.frame(traits = trait_names)
 rownames(trait_dataframe) <- trait_names
+
 
 similarity_matrices <- list()
 for (entry in res_list) {
@@ -95,23 +97,42 @@ for (entry in res_list) {
   similarity_matrices <- c(similarity_matrices, list(matrix))
 }
 
+# Create an empty list to store data frames
 similarity_data_frames <- list()
 
+# Iterate over each matrix in the list
 for (matrix in similarity_matrices) {
   # Convert the matrix into a data frame
   matrix_df <- as.data.frame(matrix)
   
+  # Append the data frame to the list
   similarity_data_frames <- c(similarity_data_frames, list(matrix_df))
 }
 
-heatmap_data <- as.matrix(trait_dataframe[, -ncol(trait_dataframe)])
-rownames(heatmap_data) <- trait_dataframe$Traits
+# Convert trait_dataframe to a matrix to preserve row names
+trait_matrix <- as.matrix(trait_dataframe)
 
-heatmap_data <- apply(heatmap_data, 2, as.numeric)
+# Iterate over each similarity matrix in similarity_data_frames
+for(i in seq_along(similarity_data_frames)) {
+  # Subset the current similarity matrix to match the row names of trait_matrix
+  subset_similarity <- similarity_data_frames[[i]][rownames(trait_matrix), ]
+  
+  # Combine trait_matrix and subset_similarity using cbind
+  trait_matrix <- cbind(trait_matrix, subset_similarity)
+  
+}
 
-heatmap(heatmap_data, Rowv = NA, Colv = NA, scale = "row",
-        xlab = "Traits", ylab = "Samples", main = "Heatmap of Traits")
+merged_df <- as.data.frame(trait_matrix)
+merged_df$traits <- NULL 
+merged_df <- merged_df[!rowSums(is.na(merged_df)) == ncol(merged_df), ]
 
+# Remove non-numeric columns
+merged_df_numeric <- merged_df[, sapply(merged_df, is.numeric)]
 
+my_palette <- c("white","blue", "darkblue")
 
+# Plot heatmap for the current merged dataframe
+heatmap(as.matrix(merged_df_numeric), Rowv = NA, Colv = NA, scale = "none",
+        col = my_palette,
+        main = paste("Heatmap for Similarity Matrix", i))
 
