@@ -1,7 +1,7 @@
 # Function to create from a list of paths corresponding to GWAS studies of traits of interest
 # a merged betas and merged ses data frame
 
-create_merged_betas_for_traits <- function(paths_of_interest, fullname = FALSE){
+create_merged_dfs_for_traits <- function(paths_of_interest, fullname = FALSE, complete_name = FALSE, new_gwas = FALSE){
   # Create lists to fill with betas and ses df
   betas_df_list <- list()
   ses_df_list <- list()
@@ -13,13 +13,13 @@ create_merged_betas_for_traits <- function(paths_of_interest, fullname = FALSE){
     sublist <- paths_of_interest[[i]]  # Get the sublist
     
     # Get trait name
-    trait <- extract_trait(sublist[1], fullname)
+    trait <- extract_trait(sublist[1], fullname, complete_name)
     print(paste("Creating betas and ses dataframe for: ", trait))
     # Store trait in list
     traitnames_list[length(traitnames_list)+1] <- trait
     
     # attempt to create betas df from sublist and continue if an error occurs
-    result_betas_df <- tryCatch(create_betas_df(sublist), error = function(e){
+    result_betas_df <- tryCatch(create_betas_df(sublist, new_gwas = new_gwas), error = function(e){
       print(paste("create_betas_df produced the following error for trait ", trait, ":",e))
       print("continue with next trait...")
       return(NULL)  # Return NULL to assign an empty dataframe
@@ -31,7 +31,7 @@ create_merged_betas_for_traits <- function(paths_of_interest, fullname = FALSE){
     }
     
     # attempt to create betas df from sublist and continue if an error occurs
-    result_ses_df <- tryCatch(create_ses_df(sublist), error = function(e){
+    result_ses_df <- tryCatch(create_ses_df(sublist, new_gwas = new_gwas), error = function(e){
       print(paste("create_betas_df produced the following error for trait ", trait, ":",e))
       print("continue with next trait...")
       return(NULL)  # Return NULL to assign an empty dataframe
@@ -99,13 +99,13 @@ create_merged_betas_for_traits <- function(paths_of_interest, fullname = FALSE){
 
 
 # Function to group paths together
-group_paths_by_trait <- function(path_list, fullnames = FALSE){
+group_paths_by_trait <- function(path_list, fullnames = FALSE, complete_names = FALSE){
   output_list <- list()
   
   for (i in seq_along(path_list)){
     trait_path <- path_list[i]
     # get trait name
-    trait <- extract_trait(trait_path, fullname = fullnames)
+    trait <- extract_trait(trait_path, fullname = fullnames, complete_name = complete_names)
     # see if already present in list and create new entry or extend existing entry
     if(trait %in% names(output_list)){
       existing_traits <- output_list[[trait]]
@@ -134,12 +134,17 @@ get_paths_of_interest <- function(trait_path_dict, list_of_traits){
 # ----------------------------------------------------------------------
 
 # Function to extract betas from GWAS tsv.gz data defined by their paths
-create_betas_df <- function(paths){
+create_betas_df <- function(paths, new_gwas = FALSE){
   # Read each .gz file and bind the resulting data frames together
   output <- lapply(paths, function(paths) {
     # Read the data and explicitly specify the column types to ensure consistency
     data <- read.table(gzfile(paths), header = TRUE, sep = "\t",na.strings = "-NA", stringsAsFactors = FALSE, colClasses = c(beta_effect = "numeric"))
-    new_column_name <- as.character(data$trait[1])
+    # If new GWAS data. Retrieve trait from path, since there is no trait column
+    if(new_gwas){
+      new_column_name <- extract_trait(paths, new_gwas = TRUE)
+    }else{
+      new_column_name <- as.character(data$trait[1])
+    }
     data %>%
       select(SNP, beta_effect) %>%
       rename(!!new_column_name := beta_effect)
@@ -157,12 +162,17 @@ create_betas_df <- function(paths){
 # -------------------------------------------------------------------
 
 # Function to extract ses from GWAS tsv.gz data defined by their paths
-create_ses_df <- function(paths){
+create_ses_df <- function(paths, new_gwas = FALSE){
   # Read each .gz file and bind the resulting data frames together
   output <- lapply(paths, function(paths) {
     # Read the data and explicitly specify the column types to ensure consistency
     data <- read.table(gzfile(paths), header = TRUE, sep = "\t",na.strings = "-NA", stringsAsFactors = FALSE, colClasses = c(SE = "numeric"))
-    new_column_name <- as.character(data$trait[1])
+    # If new GWAS data. Retrieve trait from path, since there is no trait column
+    if(new_gwas){
+      new_column_name <- extract_trait(paths, new_gwas = TRUE)
+    }else{
+      new_column_name <- as.character(data$trait[1])
+    }
     data %>%
       select(SNP, SE) %>%
       rename(!!new_column_name := SE)
@@ -180,15 +190,28 @@ create_ses_df <- function(paths){
 # -------------------------------------------------------------------
 
 # Function to extract the trait from a standard GWAS file path name
-extract_trait <- function(file_path, fullname = FALSE) {
+extract_trait <- function(file_path, fullname = FALSE, complete_name = FALSE, new_gwas = FALSE) {
+  # Get the basename of the path
+  base_name <- basename(as.character(file_path))
+  
   # Specify if we want to be more specific for the trait name
   pat <- ".*pmid[0-9]+_([A-Za-z0-9]+).*"
   if(fullname){
-    pat <- ".*pmid[0-9]+_([^\\.]+)\\..*" # capture everything aside from a dot
+    pat <- ".*pmid[0-9]+_([^\\.]+)\\..*" # capture everything after pmid to first dot
+  }
+   else if(complete_name){
+    pat <- ".*/([^/.]+)\\..*" # capture everything until dot
+  }
+  else if(new_gwas){
+    # If pathbase starts with pmid just keep specific pattern
+    # Else just take the start of the string until firts underscore
+    if(!startsWith(base_name,"pmid")){
+      pat <- "^([^_]+)_.*"
+    }
   }
   
   # Extract the trait abbreviation using regular expression
-  trait <- gsub(pat, "\\1", file_path)
+  trait <- gsub(pat, "\\1", base_name)
   return(trait)
 }
 

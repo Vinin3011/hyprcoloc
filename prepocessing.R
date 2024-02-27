@@ -4,21 +4,22 @@ library(data.table)
 library(purrr)
 
 
-traits_of_interest <- list("CTACK", "IL18", "MIP1b", "IL8", "T2D")
+traits_of_interest <- list("ALS_80610_29566793-GCST005647-EFO_0000253")
 
 # cluster traits by region?
 region_traits <- FALSE
+complete_names <- TRUE
 
 # paths for cytokines and single GWAS
-cytokines_directory <- "Harmonized GWAS results/cytokines"
-single_GWAS_directory <- "Harmonized GWAS results/single_GWAS"
+cytokines_directory <- "Harmonized GWAS results/cytokines_new"
+single_GWAS_directory <- "Harmonized GWAS results/full_unfiltered"
 metabolite_directory <- "Harmonized GWAS results/metabolites"
 cytokines_paths <- list.files(cytokines_directory, full.names = TRUE)
 single_GWAS_paths <- list.files(single_GWAS_directory, full.names = TRUE)
 metabolite_paths <- list.files(metabolite_directory, full.names = TRUE)
 
 # group the paths by traits in lists
-single_GWAS_traits_list <- group_paths_by_trait(single_GWAS_paths, fullnames = region_traits)
+single_GWAS_traits_list <- group_paths_by_trait(single_GWAS_paths, complete_names = TRUE)
 cytokine_traits_list <- group_paths_by_trait(cytokines_paths, fullnames = region_traits)
 metabolite_traits_list <- group_paths_by_trait(metabolite_paths, fullnames = region_traits)
 

@@ -51,4 +51,3 @@ test_list <- create_merged_betas_for_traits(paths_of_interest)
 rm(identical, ms_betas_unique2)
 rm(file_paths)
 
-

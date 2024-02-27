@@ -5,27 +5,26 @@ library(purrr)
 
 # All trait groups of interest
 trait_groups_of_interest <- list(
-  list("MCP1", "RANTES", "eotaxin", "IL6"),
-  list("IL10", "RA", "ALS"),
-  list("CRP", "MCSF", "MS", "SCGFb"),
-  list("CTACK", "IL18", "MIP1b", "IL8", "T2D")
+  list("bNGF_27989323-GCST004421-EFO_0008035", "pmid33987465_PD_eur_full")
   )
 
 # cluster traits by region?
 region_traits <- FALSE
+complete_name <- TRUE
+new_gwas <- TRUE
 
 # paths for cytokines and single GWAS
-cytokines_directory <- "Harmonized GWAS results/cytokines"
-single_GWAS_directory <- "Harmonized GWAS results/single_GWAS"
+cytokines_directory <- "Harmonized GWAS results/cytokines_new"
+single_GWAS_directory <- "Harmonized GWAS results/full_unfiltered"
 metabolite_directory <- "Harmonized GWAS results/metabolites"
 cytokines_paths <- list.files(cytokines_directory, full.names = TRUE)
 single_GWAS_paths <- list.files(single_GWAS_directory, full.names = TRUE)
 metabolite_paths <- list.files(metabolite_directory, full.names = TRUE)
 
 # group the paths by traits in lists
-single_GWAS_traits_list <- group_paths_by_trait(single_GWAS_paths, fullnames = region_traits)
-cytokine_traits_list <- group_paths_by_trait(cytokines_paths, fullnames = region_traits)
-metabolite_traits_list <- group_paths_by_trait(metabolite_paths, fullnames = region_traits)
+single_GWAS_traits_list <- group_paths_by_trait(single_GWAS_paths, fullnames = region_traits, complete_names = complete_name)
+cytokine_traits_list <- group_paths_by_trait(cytokines_paths, fullnames = region_traits, complete_names = complete_name)
+metabolite_traits_list <- group_paths_by_trait(metabolite_paths, fullnames = region_traits, complete_names = complete_name)
 
 all_traits_list <- c(single_GWAS_traits_list, cytokine_traits_list, metabolite_traits_list)
 
@@ -43,7 +42,7 @@ for (i in seq_along(trait_groups_of_interest)) {
   paths_of_interest <- get_paths_of_interest(all_traits_list, traits_of_interest)
   
   # create the merged data frames
-  current_merged_dfs <- create_merged_betas_for_traits(paths_of_interest)
+  current_merged_dfs <- create_merged_dfs_for_traits(paths_of_interest, complete_name = complete_name, new_gwas = new_gwas)
   
   # append to list of all groups
   merged_df_list[[traits_group]] <- current_merged_dfs
