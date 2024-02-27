@@ -200,7 +200,7 @@ extract_trait <- function(file_path, fullname = FALSE, complete_name = FALSE, ne
     pat <- ".*pmid[0-9]+_([^\\.]+)\\..*" # capture everything after pmid to first dot
   }
    else if(complete_name){
-    pat <- ".*/([^/.]+)\\..*" # capture everything until dot
+    pat <- "([^/.]+)\\..*" # capture everything until dot
   }
   else if(new_gwas){
     # If pathbase starts with pmid just keep specific pattern
