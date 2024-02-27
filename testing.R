@@ -47,6 +47,10 @@ test_list <- create_merged_betas_for_traits(paths_of_interest)
 
 # -------------------------------------------------
 
+base_name <- basename(as.character("Harmonized GWAS results/full_unfiltered/pmid33987465_PD_eur_full"))
+pat <- "([^/.]+)\\..*"
+trait <- gsub(pat, "\\1", base_name)
+
 # cleanup
 rm(identical, ms_betas_unique2)
 rm(file_paths)

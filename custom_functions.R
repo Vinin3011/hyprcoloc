@@ -138,7 +138,7 @@ create_betas_df <- function(paths, new_gwas = FALSE){
   # Read each .gz file and bind the resulting data frames together
   output <- lapply(paths, function(paths) {
     # Read the data and explicitly specify the column types to ensure consistency
-    data <- read.table(gzfile(paths), header = TRUE, sep = "\t",na.strings = "-NA", stringsAsFactors = FALSE, colClasses = c(beta_effect = "numeric"))
+    data <- read.table(gzfile(paths), header = TRUE, sep = "\t",na.strings = "-NA", stringsAsFactors = FALSE, colClasses = c(beta_effect = "numeric"), fill = TRUE)
     # If new GWAS data. Retrieve trait from path, since there is no trait column
     if(new_gwas){
       new_column_name <- extract_trait(paths, new_gwas = TRUE)
@@ -166,7 +166,7 @@ create_ses_df <- function(paths, new_gwas = FALSE){
   # Read each .gz file and bind the resulting data frames together
   output <- lapply(paths, function(paths) {
     # Read the data and explicitly specify the column types to ensure consistency
-    data <- read.table(gzfile(paths), header = TRUE, sep = "\t",na.strings = "-NA", stringsAsFactors = FALSE, colClasses = c(SE = "numeric"))
+    data <- read.table(gzfile(paths), header = TRUE, sep = "\t",na.strings = "-NA", stringsAsFactors = FALSE, colClasses = c(SE = "numeric"), fill=TRUE)
     # If new GWAS data. Retrieve trait from path, since there is no trait column
     if(new_gwas){
       new_column_name <- extract_trait(paths, new_gwas = TRUE)

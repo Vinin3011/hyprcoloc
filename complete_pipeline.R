@@ -3,11 +3,11 @@ library(dplyr)
 library(data.table)
 library(purrr)
 
-# All trait groups of interest
 trait_groups_of_interest <- list(
-  list("bNGF_27989323-GCST004421-EFO_0008035", "pmid33987465_PD_eur_full")
-  )
-
+  list("bNGF_27989323-GCST004421-EFO_0008035", "pmid33987465_PD_eur_full", "ALS_80610_29566793-GCST005647-EFO_0000253", "pmid21833088_MS_eur_full", "RA_311292_33310728-GCST90013534-EFO_0000685", "eotaxin_27989323-GCST004460-EFO_0008122", "TNFa_27989323-GCST004426-EFO_0004684", "T2D_659316_30054458-GCST006867-EFO_0001360",
+       "pmid24816252_asparagine_eur_pval", "MCP1_27989323-GCST004438-EFO_0004749")
+  # ,list("eotaxin_27989323-GCST004460-EFO_0008122", "MCP1_27989323-GCST004438-EFO_0004749", "IL6_27989323-GCST004446-EFO_0004810", "IFNg_27989323-GCST004456-EFO_0008165")
+)
 # cluster traits by region?
 region_traits <- FALSE
 complete_name <- TRUE
@@ -58,23 +58,23 @@ for (i in seq_along(merged_df_list)) {
   # extract data frames
   merged_betas_matrix <- current_dfs[["betas"]]
   merged_ses_matrix <- current_dfs[["ses"]]
- 
+  
   # Arrange arguments for analysis function
   traits <- colnames(merged_betas_matrix)
   rsid <- rownames(merged_betas_matrix)
- 
+  
   # run hyprcoloc analysis with extracted data frames
   res <- hyprcoloc(merged_betas_matrix, merged_ses_matrix, trait.names=traits, snp.id=rsid, snpscores = TRUE)
-
+  
   sensitvity_plot <- sensitivity.plot(merged_betas_matrix, merged_ses_matrix, trait.names = traits, snp.id=rsid, 
-                   reg.thresh = c(0.6,0.7,0.8,0.9), align.thresh = c(0.6,0.7,0.8,0.9), prior.c = c(0.02, 0.01, 0.005), equal.thresholds = FALSE, similarity.matrix = TRUE)
+                                      reg.thresh = c(0.6,0.7,0.8,0.9), align.thresh = c(0.6,0.7,0.8,0.9), prior.c = c(0.02, 0.01, 0.005), equal.thresholds = FALSE, similarity.matrix = TRUE)
   
   output_list <- list(
     traits = traits,
     res = res,
     sens_plot = sensitvity_plot
   )
-
+  
   # group
   traits_group <- paste(traits, collapse = ", ")
   
@@ -82,12 +82,8 @@ for (i in seq_along(merged_df_list)) {
   res_list[[traits_group]] <- output_list
 }
 
-# Extrahiere die Namen der äußeren Liste (die Trait-Namen)
-trait_names <- names(all_traits_list)
-
-trait_dataframe <- data.frame(traits = trait_names)
-rownames(trait_dataframe) <- trait_names
-
+trait_dataframe <- data.frame(traits = traits)
+rownames(trait_dataframe) <- traits
 
 similarity_matrices <- list()
 for (entry in res_list) {
@@ -122,7 +118,7 @@ for(i in seq_along(similarity_data_frames)) {
 }
 
 merged_df <- as.data.frame(trait_matrix)
-merged_df$traits <- NULL 
+#merged_df$traits <- NULL 
 merged_df <- merged_df[!rowSums(is.na(merged_df)) == ncol(merged_df), ]
 
 # Remove non-numeric columns
